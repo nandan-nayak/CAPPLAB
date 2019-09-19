@@ -3,29 +3,104 @@ package udpcommunication;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
 
 
-
-
-
-
-class JoeBuffer extends Thread
+class QueueStorage
 {
+	
+	public static Queue<String> joe=new LinkedList<>();
+	public static Queue<String> marie=new LinkedList<>();
+	
+}
+
+
+
+class JoeBufferSend extends Thread
+{
+	//QueueStorage q=new QueueStorage();
+	
+	
+	public void run()
+	{
+		
+		DatagramPacket DpSend=null;
+		Scanner sc;
+		DatagramSocket ds=null;
+		InetAddress ip=null;
+		 byte buf[];
+		 try {
+		 ds= new DatagramSocket(); 
+		
+		 ip = InetAddress.getLocalHost();
+		 }catch(Exception e) {}
+	     buf= null; 
+	
+		
+		//  System.out.println("JOE send started");
+		       
+		  
+		        
+		        while (true) 
+		        { 
+		        	
+		        	try {
+		        	Thread.sleep(5);
+		        	}
+		        	catch(Exception e) 
+		        	{
+		        		e.printStackTrace();
+		        	}
+		        	
+		        	
+		           while(QueueStorage.joe.size()>0) {
+		        	   String inp=QueueStorage.joe.remove();
+		        	  
+		        	   buf = inp.getBytes(); 
+		        	   DpSend = new DatagramPacket(buf, buf.length, ip, 1235); 
+		        	   try {
+				            ds.send(DpSend); 
+				            	}catch(Exception e) {}
+				
+		           }
+		          
+		           
+		          
+		           
+		           
+		        } 
+		
+		
+	}
+	
+	
+	
+	
+}
+
+
+class JoeBufferRecieve extends Thread
+{
+	
 	Buffer o=new Buffer();
 	String message[];
 	public void run()
 	{	
 		DatagramSocket joeSocket=null;
-		//DatagramSocket marieSocket=null;
+		
+
 		byte[] joereceive = new byte[65535]; 
-		//byte[] mariereceive = new byte[65535]; 
+		
+
 		DatagramPacket JoeDpReceive = null; 
-		//DatagramPacket MarieDpReceive = null; 
+		
+ 
 		try {
 		
 		joeSocket=new DatagramSocket(1234);
-		
-	//	marieSocket=new DatagramSocket(1235);
 		
 		
 		}catch(IOException e)
@@ -40,8 +115,7 @@ class JoeBuffer extends Thread
 
 	     
 	         
-	  //       MarieDpReceive = new DatagramPacket(mariereceive, mariereceive.length); 
-	         JoeDpReceive = new DatagramPacket(joereceive, joereceive.length); 
+	        JoeDpReceive = new DatagramPacket(joereceive, joereceive.length); 
 
 	        
 	         try
@@ -52,9 +126,9 @@ class JoeBuffer extends Thread
 	     joeSocket.receive(JoeDpReceive); 
 	         }catch(IOException e) {e.printStackTrace();}
 	         
-	         System.out.println(" joe message : " + data(joereceive) ); 
+	         QueueStorage.marie.add(data(joereceive).toString());
 	         
-
+	     
 	         joereceive = new byte[65535];
 	        
 	     } 
@@ -95,7 +169,75 @@ class JoeBuffer extends Thread
 
 
 
-class MarieBuffer extends Thread
+
+class MarieBufferSend extends Thread
+{
+	
+	DatagramPacket DpSend =null;
+	
+	public void run()
+	{
+		
+
+		Scanner sc;
+		DatagramSocket ds=null;
+		InetAddress ip=null;
+		 byte buf[];
+		 try {
+		 ds= new DatagramSocket(); 
+		
+		 ip = InetAddress.getLocalHost();
+		 }catch(Exception e) {}
+	     buf= null; 
+	
+		
+		       
+		  
+		        
+		        while (true) 
+		        { 
+		        	try {
+			        	Thread.sleep(5);
+			        	}
+			        	catch(Exception e) 
+			        	{
+			        		e.printStackTrace();
+			        	}
+		        	
+		        	
+		        	
+		        	
+		        	
+		        	sc = new Scanner(System.in); 
+		 
+			    	while(QueueStorage.marie.size()>0)
+		        	{
+		        	String inp=QueueStorage.marie.remove();
+		                buf = inp.getBytes(); 
+		                DpSend = new DatagramPacket(buf, buf.length, ip, 1335);
+
+		        	try {
+		           	 ds.send(DpSend); 
+		            	}catch(Exception e) {}
+		        	}
+		          
+		             
+		  
+		          
+		
+		           
+		        } 
+		
+		
+			}
+	
+	
+	
+	
+}
+
+
+class MarieBufferRecieve extends Thread
 {
 	Buffer o=new Buffer();
 	String message[];
@@ -106,7 +248,7 @@ class MarieBuffer extends Thread
 		DatagramPacket DpReceive = null; 
 		try {
 		
-		marieSocket=new DatagramSocket(1235);
+		marieSocket=new DatagramSocket(1334);
 		
 		
 		
@@ -121,10 +263,9 @@ class MarieBuffer extends Thread
 		while (true)
 	     { 
 			
-	         // Step 2 : create a DatgramPacket to receive the data. 
+	        
 	         DpReceive = new DatagramPacket(receive, receive.length); 
 
-	         // Step 3 : revieve the data in byte buffer. 
 	         try
 	         {
 	        	 
@@ -132,17 +273,10 @@ class MarieBuffer extends Thread
 	         marieSocket.receive(DpReceive); 
 	         }catch(IOException e) {e.printStackTrace();}
 	         
-	         
-	         System.out.println("marie's  message : " + data(receive)); 
+	         QueueStorage.joe.add(data(receive).toString());
+	        // System.out.println("marie's  message : " + ); 
 
-	         // Exit the server if the client sends "bye" 
-	         if (data(receive).toString().equals("bye")) 
-	         { 
-	             System.out.println("Client sent bye.....EXITING"); 
-	             break; 
-	         } 
-
-	         // Clear the buffer after every message. 
+	        
 	         receive = new byte[65535]; 
 	     } 
 		
@@ -183,13 +317,22 @@ public class Buffer {
 	{
 		// TODO Auto-generated method stub
 		
-	JoeBuffer j=new JoeBuffer();
-	MarieBuffer m=new MarieBuffer();
-System.out.println("buffer started");
-	m.start();
-	j.start();
-	m.join();
-	j.join();
+	JoeBufferRecieve jr=new JoeBufferRecieve();
+	JoeBufferSend js=new JoeBufferSend();
+	MarieBufferRecieve mr=new MarieBufferRecieve();
+	MarieBufferSend ms=new MarieBufferSend();
+System.out.println("server started");
+	mr.start();
+	jr.start();
+	js.start();
+	ms.start();
+	mr.join();
+	jr.join();
+	ms.join();
+	
+	
+	
+	js.join();
 
 	//	DatagramSocket marieSocket=new DatagramSocket(1235);
 		
