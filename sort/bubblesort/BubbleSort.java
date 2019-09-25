@@ -5,7 +5,7 @@ import java.util.*;
 class BubbleSort
 {
 
-public static void selectionSort(int ar[],int n)
+public static void bubbleSort(int ar[],int n)
 {
 
 	int i,temp,j;
@@ -56,7 +56,7 @@ public static void main(String aa[])
 		System.out.println(ar[i]);
 	}
 
-	selectionSort(ar,n);
+	bubbleSort(ar,n);
 }
 
 
