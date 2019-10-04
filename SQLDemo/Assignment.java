@@ -225,10 +225,10 @@ public class Assignment  {
 				System.out.println("enter city");
 				city=in.nextLine();
 		
-				System.out.println("enter phone");
+				System.out.println("enter phone (9 digits )");
 				phone=Integer.parseInt(in.nextLine());
 		
-				System.out.println("enter status");
+				System.out.println("enter status ( 0/1 )");
 				status=Integer.parseInt(in.nextLine());
 				
 				b.insertData(name, email, phone, city, status);
